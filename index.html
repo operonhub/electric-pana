@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es-AR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electric Pana — Presupuestos</title>
+  <meta name="description" content="Armá presupuestos de Electric Pana en segundos: buscá productos, poné cantidades y enviá por WhatsApp o imprimí." />
+  <meta name="theme-color" content="#1D4E89" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- ===================== HEADER ===================== -->
+  <header class="header">
+    <div class="contenedor">
+      <div class="marca">
+        <span class="marca-rayo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+        </span>
+        <div class="marca-txt">
+          <div class="nombre">ELECTRIC PANA</div>
+          <div class="sub">Materiales Eléctricos · Presupuestos</div>
+        </div>
+      </div>
+      <button class="btn-tema" id="btnTema" type="button" aria-label="Cambiar entre claro y oscuro" title="Cambiar tema">
+        <svg class="ico-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="ico-luna" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================== TABS ===================== -->
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button class="tab" id="tabPresu" role="tab" aria-selected="true" aria-controls="vistaPresu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+      Presupuesto
+    </button>
+    <button class="tab" id="tabCatalogo" role="tab" aria-selected="false" aria-controls="vistaCatalogo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Lista de precios
+    </button>
+  </nav>
+
+  <main class="contenedor">
+    <!-- ===================== VISTA: PRESUPUESTO ===================== -->
+    <section class="vista" id="vistaPresu" role="tabpanel" aria-labelledby="tabPresu">
+      <!-- Datos del cliente -->
+      <div class="card">
+        <h2>Datos del presupuesto</h2>
+        <label class="campo">
+          <span class="txt">Cliente</span>
+          <div class="combo">
+            <input type="text" id="inpCliente" placeholder="Ej: Casa Marcelo" autocomplete="off" />
+            <svg class="combo-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <div class="resultados" id="resClientes" hidden></div>
+        </label>
+        <label class="campo">
+          <span class="txt">Domicilio</span>
+          <input type="text" id="inpDomicilio" placeholder="Opcional" autocomplete="off" />
+        </label>
+      </div>
+
+      <!-- Agregar productos -->
+      <div class="card">
+        <h2>Agregar productos</h2>
+        <p class="hint" style="margin-bottom:10px">Buscá por nombre o código y tocá el producto para sumarlo.</p>
+        <div class="buscador">
+          <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="buscaPresu" placeholder="Ej: cable, antena, 5600…" autocomplete="off" />
+        </div>
+        <div class="resultados" id="resPresu" hidden></div>
+      </div>
+
+      <!-- Ítems + total -->
+      <div class="card">
+        <h2>Detalle</h2>
+        <div id="listaItems"></div>
+        <div class="vacio" id="itemsVacio">Todavía no agregaste productos.</div>
+        <div class="resumen" id="resumen" hidden>
+          <div class="resumen-linea">
+            <span>Subtotal</span>
+            <span id="subtotalNum">$ 0</span>
+          </div>
+          <div class="resumen-desc">
+            <span class="rd-lbl">Descuento</span>
+            <div class="rd-control">
+              <select id="descModo" aria-label="Tipo de descuento">
+                <option value="pct">%</option>
+                <option value="monto">$</option>
+              </select>
+              <input type="text" id="descValor" inputmode="numeric" placeholder="0" aria-label="Valor del descuento" />
+            </div>
+            <span id="descNum" class="rd-monto">- $ 0</span>
+          </div>
+          <div class="total-caja" id="totalCaja">
+            <span class="t-lbl">TOTAL</span>
+            <span class="t-num" id="totalNum">$ 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="acciones">
+        <button class="btn btn-wpp" id="btnPdfWpp" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.4A10 10 0 1 0 12 2zm5.3 14c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .1-1.6-.1-1.6-.5-3.4-1.9-4.6-3.9-.4-.7-.6-1.4-.6-2 0-.6.3-1.1.6-1.4.2-.2.4-.2.6-.2h.4c.2 0 .3.1.5.4l.6 1.4c.1.2 0 .4-.1.5l-.4.5c-.1.1-.1.2 0 .4.4.7 1 1.3 1.7 1.7.2.1.3.1.4 0l.5-.5c.1-.2.3-.2.5-.1l1.3.7c.2.1.3.2.3.4z"/></svg>
+          Enviar PDF por WhatsApp
+        </button>
+        <button class="btn btn-linea" id="btnWpp" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.4A10 10 0 1 0 12 2zm5.3 14c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .1-1.6-.1-1.6-.5-3.4-1.9-4.6-3.9-.4-.7-.6-1.4-.6-2 0-.6.3-1.1.6-1.4.2-.2.4-.2.6-.2h.4c.2 0 .3.1.5.4l.6 1.4c.1.2 0 .4-.1.5l-.4.5c-.1.1-.1.2 0 .4.4.7 1 1.3 1.7 1.7.2.1.3.1.4 0l.5-.5c.1-.2.3-.2.5-.1l1.3.7c.2.1.3.2.3.4z"/></svg>
+          Enviar resumen (texto)
+        </button>
+        <button class="btn btn-acento" id="btnImprimir" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          Imprimir / PDF
+        </button>
+        <button class="btn btn-linea" id="btnLimpiar" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          Vaciar
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== VISTA: LISTA DE PRECIOS ===================== -->
+    <section class="vista" id="vistaCatalogo" role="tabpanel" aria-labelledby="tabCatalogo" hidden>
+      <div class="card">
+        <div class="catalogo-barra">
+          <div class="buscador">
+            <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="buscaCatalogo" placeholder="Buscar producto o código…" autocomplete="off" />
+          </div>
+          <button class="btn btn-primario btn-chico" id="btnNuevo" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Nuevo
+          </button>
+        </div>
+        <div class="acciones" style="margin-bottom:8px">
+          <button class="btn btn-acento btn-chico" id="btnListaImprimir" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            Imprimir lista / PDF
+          </button>
+          <button class="btn btn-excel btn-chico" id="btnListaExcel" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 13 6 6M15 13l-6 6"/></svg>
+            Descargar Excel
+          </button>
+          <button class="btn btn-wpp btn-chico" id="btnListaPdfWpp" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.4A10 10 0 1 0 12 2zm5.3 14c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .1-1.6-.1-1.6-.5-3.4-1.9-4.6-3.9-.4-.7-.6-1.4-.6-2 0-.6.3-1.1.6-1.4.2-.2.4-.2.6-.2h.4c.2 0 .3.1.5.4l.6 1.4c.1.2 0 .4-.1.5l-.4.5c-.1.1-.1.2 0 .4.4.7 1 1.3 1.7 1.7.2.1.3.1.4 0l.5-.5c.1-.2.3-.2.5-.1l1.3.7c.2.1.3.2.3.4z"/></svg>
+            Enviar PDF por WhatsApp
+          </button>
+        </div>
+        <p class="hint" style="margin:-2px 0 10px">Se descarga/imprime/envía lo que estés viendo. Buscá una categoría para exportar solo esos productos, o dejalo vacío para la lista completa.</p>
+        <div class="acciones" style="margin-bottom:6px">
+          <button class="btn btn-linea btn-chico" id="btnAumento" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M17 7h4v4"/></svg>
+            Aumentar precios %
+          </button>
+          <button class="btn btn-linea btn-chico" id="btnAumentoUSD" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M17 7h4v4"/></svg>
+            Aumentar USD %
+          </button>
+          <button class="btn btn-linea btn-chico" id="btnBackup" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Guardar copia en la nube
+          </button>
+          <button class="btn btn-linea btn-chico" id="btnRestore" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Ver copias guardadas
+          </button>
+          <button class="btn btn-linea btn-chico" id="btnVerCambios" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Ver cambios de precio
+          </button>
+          <button class="btn btn-wpp btn-chico" id="btnEnviarCambios" type="button" hidden>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.4A10 10 0 1 0 12 2zm5.3 14c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .1-1.6-.1-1.6-.5-3.4-1.9-4.6-3.9-.4-.7-.6-1.4-.6-2 0-.6.3-1.1.6-1.4.2-.2.4-.2.6-.2h.4c.2 0 .3.1.5.4l.6 1.4c.1.2 0 .4-.1.5l-.4.5c-.1.1-.1.2 0 .4.4.7 1 1.3 1.7 1.7.2.1.3.1.4 0l.5-.5c.1-.2.3-.2.5-.1l1.3.7c.2.1.3.2.3.4z"/></svg>
+            Enviar solo cambios por WhatsApp
+          </button>
+        </div>
+        <div id="panelCopias" class="panel-copias" hidden>
+          <div id="listaCopias"></div>
+        </div>
+        <div class="contador" id="contadorCatalogo"></div>
+      </div>
+      <div id="listaCatalogo"></div>
+      <div class="vacio" id="catalogoVacio" hidden>No se encontraron productos.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Electric Pana — Presupuestos · Los datos se guardan en este dispositivo.
+  </footer>
+
+  <!-- Zona de modales -->
+  <div id="zonaModal"></div>
+
+  <!-- Aviso emergente -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/data.js"></script>
+  <script src="js/calc.js"></script>
+  <script src="js/xlsx.js"></script>
+  <script src="js/pdf.js"></script>
+  <script src="js/supabase-sync.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
