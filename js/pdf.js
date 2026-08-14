@@ -246,7 +246,7 @@
         _texto(ops, MARGEN, y, 'Fecha: ' + fecha, 9, false);
         y -= 12;
         if (cliente) { _texto(ops, MARGEN, y, 'Cliente: ' + cliente, 11, true); y -= 14; }
-        if (domicilio) { _texto(ops, MARGEN, y, 'Domicilio: ' + domicilio, 9, false); y -= 12; }
+        if (domicilio) { _texto(ops, MARGEN, y, 'Localidad: ' + domicilio, 9, false); y -= 12; }
         y -= 6;
         esPrimera = false;
       } else {

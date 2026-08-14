@@ -13,15 +13,35 @@
   const K_TEMA = 'ep_tema';
 
   // Clientes habituales para autocompletar (no bloquea escribir uno nuevo).
+  // Todo en mayúsculas: así lo pidió el dueño, para que quede prolijo en el
+  // presupuesto sin importar cómo lo tipeen.
   const CLIENTES_CONOCIDOS = [
-    'MS', 'La Rosita', 'Alvear', 'Los Troncos', 'Avellaneda', 'El Aleman',
-    'Ariel', 'Casa Marcelo', 'Dany', 'Britos', 'Mar', 'Sensi',
-    'Federico Perez', 'Fernandito 18', 'GO Damian', 'Kico', 'LEO',
+    'MS', 'LA ROSITA', 'ALVEAR', 'LOS TRONCOS', 'AVELLANEDA', 'EL ALEMAN',
+    'ARIEL', 'CASA MARCELO', 'DANY', 'BRITOS', 'MAR', 'CENCI',
+    'FEDERICO PEREZ', 'FERNANDITO 18', 'GO DAMIAN', 'KICO', 'LEO',
   ];
 
-  // Clientes con domicilio fijo: al elegirlos (o tipear el nombre exacto),
-  // se completa solo el campo Domicilio.
-  const DOMICILIO_AUTO = { LEO: 'BARRIO LIBERTADOR' };
+  // Localidad fija de cada cliente habitual: al elegirlos (o tipear el
+  // nombre exacto), se completa solo el campo Localidad.
+  const LOCALIDAD_AUTO = {
+    MS: 'TIGRE',
+    'LA ROSITA': 'SAN FERNANDO',
+    ALVEAR: 'TIGRE',
+    'LOS TRONCOS': 'TIGRE',
+    AVELLANEDA: 'VIRREYES',
+    'EL ALEMAN': 'PABLO PODESTA',
+    ARIEL: 'LOMA HERMOSA',
+    'CASA MARCELO': 'VILLA LIBERTAD',
+    DANY: 'VILLA BOSH',
+    BRITOS: 'TIGRE',
+    MAR: 'LOMA HERMOSA',
+    CENCI: 'LOMA HERMOSA',
+    'FEDERICO PEREZ': 'BARRIO LIBERTADOR',
+    'FERNANDITO 18': 'CAÑUELAS',
+    'GO DAMIAN': 'PABLO PODESTA',
+    KICO: 'BARRIO LIBERTADOR',
+    LEO: 'BARRIO LIBERTADOR',
+  };
 
   const estado = {
     catalogo: [],   // productos editables { id, cod, nom, precio, cat }
@@ -40,6 +60,14 @@
     return String(str == null ? '' : str)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // Convierte a mayúsculas el valor de un input mientras se tipea, sin
+  // perder la posición del cursor (Cliente y Localidad van siempre en mayúscula).
+  function forzarMayus(input) {
+    const pos = input.selectionStart;
+    input.value = input.value.toUpperCase();
+    input.setSelectionRange(pos, pos);
   }
 
   // ------------------------------------------------------------------
@@ -151,18 +179,19 @@
     // Datos del cliente (combo con sugerencias propias, no datalist nativo)
     const inpCliente = $('#inpCliente');
     inpCliente.addEventListener('input', (e) => {
+      forzarMayus(e.target);
       estado.cliente = e.target.value; guardarPresu();
       renderSugerenciasClientes(e.target.value);
     });
     inpCliente.addEventListener('focus', () => renderSugerenciasClientes(inpCliente.value));
-    inpCliente.addEventListener('focusout', () => aplicarDomicilioAuto(inpCliente.value));
+    inpCliente.addEventListener('focusout', () => aplicarLocalidadAuto(inpCliente.value));
     $('#resClientes').addEventListener('click', (e) => {
       const b = e.target.closest('[data-cliente]');
       if (!b) return;
       const valor = b.getAttribute('data-cliente');
       inpCliente.value = valor;
       estado.cliente = valor;
-      aplicarDomicilioAuto(valor);
+      aplicarLocalidadAuto(valor);
       guardarPresu();
       $('#resClientes').hidden = true;
     });
@@ -170,15 +199,18 @@
       if (!e.target.closest('#inpCliente') && !e.target.closest('#resClientes')) $('#resClientes').hidden = true;
     });
 
-    $('#inpDomicilio').addEventListener('input', (e) => { estado.domicilio = e.target.value; guardarPresu(); });
+    $('#inpDomicilio').addEventListener('input', (e) => {
+      forzarMayus(e.target);
+      estado.domicilio = e.target.value; guardarPresu();
+    });
 
-    // Ciertos clientes tienen domicilio fijo (ver DOMICILIO_AUTO): al elegirlos
-    // o tipear el nombre exacto, se completa solo el campo Domicilio.
-    function aplicarDomicilioAuto(nombreCliente) {
-      const domicilio = DOMICILIO_AUTO[String(nombreCliente || '').trim().toUpperCase()];
-      if (!domicilio) return;
-      estado.domicilio = domicilio;
-      $('#inpDomicilio').value = domicilio;
+    // Ciertos clientes tienen localidad fija (ver LOCALIDAD_AUTO): al elegirlos
+    // o tipear el nombre exacto, se completa sola el campo Localidad.
+    function aplicarLocalidadAuto(nombreCliente) {
+      const localidad = LOCALIDAD_AUTO[String(nombreCliente || '').trim().toUpperCase()];
+      if (!localidad) return;
+      estado.domicilio = localidad;
+      $('#inpDomicilio').value = localidad;
       guardarPresu();
     }
 
@@ -420,7 +452,7 @@
     L.push('*ELECTRIC PANA* — Presupuesto');
     L.push('Fecha: ' + fechaLinda(fechaHoyISO()));
     if (estado.cliente) L.push('Cliente: ' + estado.cliente);
-    if (estado.domicilio) L.push('Domicilio: ' + estado.domicilio);
+    if (estado.domicilio) L.push('Localidad: ' + estado.domicilio);
     L.push('');
     estado.items.forEach((it) => {
       const linea = calcularLinea(it.cantidad, it.precio);
