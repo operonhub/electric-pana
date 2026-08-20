@@ -562,6 +562,8 @@
       toast('Precio actualizado');
     });
     lista.addEventListener('click', (e) => {
+      const btnCat = e.target.closest('[data-editar-cat]');
+      if (btnCat) { modalCategoria(btnCat.getAttribute('data-editar-cat')); return; }
       const fila = e.target.closest('[data-prod]');
       if (!fila) return;
       const p = estado.catalogo.find((x) => String(x.id) === fila.getAttribute('data-prod'));
@@ -639,7 +641,12 @@
     let html = '';
     for (const cat of cats) {
       const prods = grupos.get(cat);
-      html += `<div class="cat-grupo"><div class="cat-titulo">${escapeHtml(cat)}</div>`;
+      html += `<div class="cat-grupo"><div class="cat-titulo">
+        <span class="cat-titulo-txt">${escapeHtml(cat)}</span>
+        <button class="icono-btn cat-editar" type="button" data-editar-cat="${escapeHtml(cat)}" aria-label="Editar categoría ${escapeHtml(cat)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        </button>
+      </div>`;
       for (const p of prods) {
         html += `
         <div class="fila" data-prod="${escapeHtml(p.id)}">
@@ -839,6 +846,36 @@
       toast(esNuevo ? 'Producto agregado' : 'Producto actualizado');
     });
     setTimeout(() => $('#mNom') && $('#mNom').focus(), 50);
+  }
+
+  // Renombra una categoría entera: cambia el campo `cat` de todos los
+  // productos que la tienen (no hay una tabla de categorías aparte, la
+  // categoría es solo el texto que comparten los productos).
+  function modalCategoria(catActual) {
+    const prods = estado.catalogo.filter((x) => x.cat === catActual);
+    abrirModal(`
+      <div class="modal" role="dialog" aria-modal="true">
+        <h3>Editar categoría</h3>
+        <p class="hint" style="margin-bottom:12px">Cambia el nombre a los <strong>${prods.length}</strong> productos de "${escapeHtml(catActual)}".</p>
+        <label class="campo"><span class="txt">Nombre de la categoría</span>
+          <input id="mCatNombre" type="text" value="${escapeHtml(catActual)}" placeholder="Ej: CABLES" /></label>
+        <div class="acciones">
+          <button class="btn btn-linea" type="button" data-cancelar>Cancelar</button>
+          <button class="btn btn-primario" type="button" id="mCatGuardar">Guardar</button>
+        </div>
+      </div>`);
+    $('#mCatGuardar').addEventListener('click', () => {
+      const nombreNuevo = $('#mCatNombre').value.trim();
+      if (!nombreNuevo) { toast('Poné un nombre'); return; }
+      if (nombreNuevo === catActual) { cerrarModal(); return; }
+      prods.forEach((p) => { p.cat = nombreNuevo; });
+      guardarCatalogo();
+      sincronizarLote(prods);
+      cerrarModal();
+      renderCatalogo();
+      toast('Categoría actualizada');
+    });
+    setTimeout(() => $('#mCatNombre') && $('#mCatNombre').select(), 50);
   }
 
   function modalAumentoUSD() {

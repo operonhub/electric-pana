@@ -304,9 +304,13 @@ input:focus, textarea:focus, select:focus {
 .cat-titulo {
   font-family: var(--serif); font-weight: 800; font-size: .82rem; letter-spacing: .03em;
   text-transform: uppercase; color: var(--primario); background: var(--papel-2);
-  padding: 8px 12px; border-radius: var(--radio-sm); margin: 14px 0 6px;
+  padding: 8px 8px 8px 12px; border-radius: var(--radio-sm); margin: 14px 0 6px;
   position: sticky; top: 60px; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
+.cat-titulo-txt { overflow-wrap: anywhere; }
+.cat-editar { flex: none; }
+.cat-editar svg { width: 15px; height: 15px; }
 .fila {
   display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px;
   align-items: center; padding: 11px 8px; border-bottom: 1px solid var(--borde);
